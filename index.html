@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reef Patrol Schedule Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .form-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        .info-card {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .success-card {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+            .header {
+                padding: 1rem;
+            }
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">🌊 Reef Patrol Schedule Generator</h1>
+            <p style="font-size: 1.1rem; opacity: 0.9;">Professional automated scheduling for Buccoo Reef Marine Park</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <h2 style="font-size: 1.5rem; font-weight: bold; color: #1e40af; margin-bottom: 1rem;">Generate Monthly Schedule</h2>
+                
+                <div class="grid">
+                    <div>
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Month</label>
+                        <select id="monthSelect">
+                            <option value="">Select Month</option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Year</label>
+                        <select id="yearSelect">
+                            <option value="">Select Year</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <button id="generateBtn" class="btn-primary" onclick="generateSchedule()">
+                        🗓️ Generate Google Apps Script
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3 style="font-size: 1.2rem; font-weight: bold; color: #0369a1; margin-bottom: 1rem;">📋 Staff Rotation Pattern</h3>
+                <div class="grid">
+                    <div>
+                        <h4 style="font-weight: 600; color: #2563eb; margin-bottom: 0.5rem;">Shift A (8AM - 4PM Weekdays)</h4>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Core Staff:</strong> MC PHERSON, WALDRON, JOHNSON, HARRIS</p>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Week 1&3:</strong> + ANDREWS, BENJAMIN</p>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Week 2&4:</strong> + ASH, GEORGE</p>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; color: #ea580c; margin-bottom: 0.5rem;">Shift B (Weekends & Varied)</h4>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Lead:</strong> LOUIS</p>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Week 1&3:</strong> + ASH, GEORGE</p>
+                        <p style="font-size: 0.9rem; color: #475569;"><strong>Week 2&4:</strong> + ANDREWS, BENJAMIN</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsSection" style="display: none;">
+                <div class="success-card">
+                    <h3 style="font-size: 1.3rem; font-weight: bold; color: #16a34a; margin-bottom: 1rem;">✅ Google Apps Script Generated Successfully!</h3>
+                    <p id="scheduleTitle" style="color: #166534; margin-bottom: 1rem; font-weight: 600;"></p>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <button id="downloadBtn" class="btn-download" onclick="downloadScript()">
+                            📥 Download Google Apps Script (.gs file)
+                        </button>
+                    </div>
+                    
+                    <div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 1rem;">
+                        <h4 style="font-weight: bold; color: #0369a1; margin-bottom: 0.75rem;">🚀 Setup Instructions:</h4>
+                        <ol style="color: #0c4a6e; font-size: 0.9rem; line-height: 1.6;">
+                            <li style="margin-bottom: 0.5rem;">Download the Google Apps Script file above (.gs file)</li>
+                            <li style="margin-bottom: 0.5rem;">Go to <a href="https://script.google.com" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 600;">script.google.com</a></li>
+                            <li style="margin-bottom: 0.5rem;">Click "New project"</li>
+                            <li style="margin-bottom: 0.5rem;">Delete the default code and paste the contents from the downloaded .gs file</li>
+                            <li style="margin-bottom: 0.5rem;">Save the project (Ctrl+S) and give it a name like "Reef Patrol Scheduler"</li>
+                            <li style="margin-bottom: 0.5rem;">Click the "Run" button (▶️) to execute</li>
+                            <li style="margin-bottom: 0.5rem;">Grant permissions when prompted</li>
+                            <li style="margin-bottom: 0.5rem;"><strong>The spreadsheet will be automatically saved to your "Reef Patrol Schedule Generated" folder!</strong></li>
+                        </ol>
+                        
+                        <div style="background: #dcfce7; border: 2px solid #16a34a; border-radius: 6px; padding: 0.75rem; margin-top: 1rem;">
+                            <strong style="color: #15803d;">🎨 Professional Formatting Included:</strong>
+                            <ul style="color: #166534; font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.5;">
+                                <li>• Date rows: Font size 20, white text, dark gray background</li>
+                                <li>• Time rows: Font size 10, white text, gray background</li>
+                                <li>• Staff names: Center-aligned text</li>
+                                <li>• Auto-sized columns for optimal viewing</li>
+                                <li>• Automatic file organization in your designated folder</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #f1f5f9; border-radius: 10px; padding: 1rem; margin-top: 2rem; text-align: center; font-size: 0.9rem; color: #64748b;">
+                <p><strong>⏰ Shift Times:</strong> Shift A: Mon-Fri 8AM-4PM (Weekends OFF) | Shift B: Mon 9-5, Tue/Thu/Fri 1-6PM, Wed OFF, Sat 9-6PM, Sun 9-5PM</p>
+                <p style="margin-top: 0.5rem;"><strong>📧 BRMP Patrol Scheduling System</strong> - Professional automated scheduling solution</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Staff configuration
+        const coreShiftAStaff = ['MC PHERSON', 'WALDRON', 'JOHNSON', 'HARRIS'];
+        const rotatingStaff = ['ASH', 'GEORGE', 'ANDREWS', 'BENJAMIN'];
+        const shiftBLead = ['LOUIS'];
+        
+        let generatedScript = null;
+
+        // Initialize year dropdown
+        function initializeYearDropdown() {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            
+            for (let i = 0; i < 10; i++) {
+                const year = currentYear + i;
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // Generate calendar data for a given month/year
+        function generateCalendarData(month, year) {
+            const monthNum = new Date(`${month} 1, ${year}`).getMonth();
+            const firstDay = new Date(year, monthNum, 1);
+            const lastDay = new Date(year, monthNum + 1, 0);
+            
+            const weeks = [];
+            const startDate = new Date(firstDay);
+            
+            // Find the first Monday of the schedule
+            while (startDate.getDay() !== 1) {
+                startDate.setDate(startDate.getDate() - 1);
+            }
+            
+            let weekNumber = 0;
+            for (let date = new Date(startDate); date <= lastDay; date.setDate(date.getDate() + 7)) {
+                weekNumber++;
+                const weekDays = [];
+                
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(date);
+                    currentDate.setDate(date.getDate() + i);
+                    
+                    if (currentDate.getMonth() === monthNum || (i === 0 && weekNumber === 1)) {
+                        weekDays.push({
+                            date: currentDate.getDate(),
+                            day: currentDate.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+                            fullDate: new Date(currentDate),
+                            inMonth: currentDate.getMonth() === monthNum
+                        });
+                    }
+                }
+                
+                if (weekDays.length > 0) {
+                    weeks.push({ weekNumber, days: weekDays });
+                }
+            }
+            
+            return weeks;
+        }
+
+        // Get staff rotation for a given week
+        function getStaffForWeek(weekNumber, shift) {
+            const isOddWeek = weekNumber % 2 === 1;
+            
+            if (shift === 'A') {
+                const rotatingForShiftA = isOddWeek ? 
+                    ['ANDREWS', 'BENJAMIN'] : 
+                    ['ASH', 'GEORGE'];
+                return [...coreShiftAStaff, ...rotatingForShiftA];
+            } else {
+                const rotatingForShiftB = isOddWeek ? 
+                    ['ASH', 'GEORGE'] : 
+                    ['ANDREWS', 'BENJAMIN'];
+                return [...shiftBLead, ...rotatingForShiftB];
+            }
+        }
+
+        // Generate shift times based on day and shift
+        function getShiftTimes(day, shift) {
+            const dayName = day.day;
+            
+            if (shift === 'A') {
+                if (['SAT', 'SUN'].includes(dayName)) {
+                    return 'OFF';  
+                }
+                return '8:00 AM - 4:00 PM';
+            } else {
+                switch (dayName) {
+                    case 'MON':
+                        return '9:00 AM - 5:00 PM';
+                    case 'TUE':
+                    case 'THU':
+                    case 'FRI':
+                        return '1:00 PM - 6:00 PM';
+                    case 'WED':
+                        return 'OFF';
+                    case 'SAT':
+                        return '9:00 AM - 6:00 PM';
+                    case 'SUN':
+                        return '9:00 AM - 5:00 PM';
+                    default:
+                        return '';
+                }
+            }
+        }
+
+        // Generate Google Apps Script
+        function generateGoogleAppsScript(month, year, weeks) {
+            const weekData = weeks.map(week => ({
+                weekNumber: week.weekNumber,
+                days: week.days.filter(day => day.inMonth || weeks.indexOf(week) === 0).map(day => ({
+                    day: day.day,
+                    date: day.date,
+                    shiftATime: getShiftTimes(day, 'A'),
+                    shiftBTime: getShiftTimes(day, 'B')
+                }))
+            }));
+
+            const script = `function createReefPatrolSchedules() {
+  // Create timestamp for filename
+  var now = new Date();
+  var timestamp = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd_HH-mm-ss");
+  var filename = 'Reef Patrol Schedule for ${month.toUpperCase()} ${year} - ' + timestamp;
+  
+  // Create a new spreadsheet
+  var spreadsheet = SpreadsheetApp.create(filename);
+  
+  // Move to specific folder
+  try {
+    var folders = DriveApp.getFoldersByName('Reef Patrol Schedule Generated');
+    if (folders.hasNext()) {
+      var targetFolder = folders.next();
+      var file = DriveApp.getFileById(spreadsheet.getId());
+      targetFolder.addFile(file);
+      DriveApp.getRootFolder().removeFile(file);
+      Logger.log('File moved to folder: Reef Patrol Schedule Generated');
+    } else {
+      Logger.log('Warning: Folder "Reef Patrol Schedule Generated" not found. File saved to root.');
+    }
+  } catch (error) {
+    Logger.log('Error moving file to folder: ' + error.toString());
+  }
+  
+  // Create sheets for both shifts
+  var shiftASheet = spreadsheet.getActiveSheet();
+  shiftASheet.setName('Shift A');
+  var shiftBSheet = spreadsheet.insertSheet('Shift B');
+  
+  // Week data
+  var weeks = ${JSON.stringify(weekData)};
+  
+  // Generate Shift A
+  generateShiftSchedule(shiftASheet, 'A', '${month}', '${year}', weeks);
+  
+  // Generate Shift B
+  generateShiftSchedule(shiftBSheet, 'B', '${month}', '${year}', weeks);
+  
+  Logger.log('Schedule created: ' + spreadsheet.getUrl());
+  return spreadsheet.getUrl();
+}
+
+function generateShiftSchedule(sheet, shift, month, year, weeks) {
+  var title = shift + '-SHIFT REEF PATROL WORK SCHEDULE FOR ' + month.toUpperCase() + ' ' + year;
+  
+  // Set title - extend to 8 columns (A-H)
+  sheet.getRange(1, 1, 1, 8).merge();
+  sheet.getRange(1, 1).setValue(title);
+  sheet.getRange(1, 1).setFontSize(16).setFontWeight('bold').setHorizontalAlignment('center');
+  
+  var currentRow = 3; // Start data from row 3
+  
+  // Process each week
+  for (var w = 0; w < weeks.length; w++) {
+    var week = weeks[w];
+    
+    // Day headers row - fill all 7 day columns (B-H)
+    for (var d = 0; d < week.days.length; d++) {
+      var day = week.days[d];
+      sheet.getRange(currentRow, d + 2).setValue(day.day + ' ' + day.date);
+    }
+    
+    // Format day headers row - extend to 8 columns (A-H)
+    sheet.getRange(currentRow, 1, 1, 8).setBackground('#434343').setFontColor('white').setFontSize(20).setFontWeight('bold').setHorizontalAlignment('center');
+    currentRow++;
+    
+    // Time headers row - fill all 7 day columns (B-H)
+    for (var d = 0; d < week.days.length; d++) {
+      var day = week.days[d];
+      var timeValue = shift === 'A' ? day.shiftATime : day.shiftBTime;
+      sheet.getRange(currentRow, d + 2).setValue(timeValue);
+    }
+    
+    // Format time headers row - extend to 8 columns (A-H)
+    sheet.getRange(currentRow, 1, 1, 8).setBackground('#666666').setFontColor('white').setFontSize(10).setHorizontalAlignment('center');
+    currentRow++;
+    
+    // Staff rows
+    var weekStaff = getStaffForWeek(week.weekNumber, shift);
+    for (var i = 0; i < weekStaff.length; i++) {
+      for (var d = 0; d < week.days.length; d++) {
+        var day = week.days[d];
+        var timeValue = shift === 'A' ? day.shiftATime : day.shiftBTime;
+        
+        if (timeValue === 'OFF') {
+          sheet.getRange(currentRow, d + 2).setValue('[OFF]');
+        } else {
+          sheet.getRange(currentRow, d + 2).setValue(weekStaff[i] || '');
+        }
+      }
+      
+      // Format staff row - center align all 8 columns (A-H)
+      sheet.getRange(currentRow, 1, 1, 8).setHorizontalAlignment('center').setVerticalAlignment('middle');
+      currentRow++;
+    }
+    
+    // Hours total row - put in column H (8th column)
+    sheet.getRange(currentRow, 8).setValue('40 hrs');
+    sheet.getRange(currentRow, 8).setFontWeight('bold').setHorizontalAlignment('center');
+    currentRow += 2; // Add space between weeks
+  }
+  
+  // Auto-resize columns 1-8 (A-H)
+  sheet.autoResizeColumns(1, 8);
+  
+  // Set minimum column width for all 8 columns
+  for (var col = 1; col <= 8; col++) {
+    if (sheet.getColumnWidth(col) < 120) {
+      sheet.setColumnWidth(col, 120);
+    }
+  }
+}
+
+function getStaffForWeek(weekNumber, shift) {
+  var coreShiftAStaff = ['MC PHERSON', 'WALDRON', 'JOHNSON', 'HARRIS'];
+  var shiftBLead = ['LOUIS'];
+  var isOddWeek = weekNumber % 2 === 1;
+  
+  if (shift === 'A') {
+    var rotatingForShiftA = isOddWeek ? ['ANDREWS', 'BENJAMIN'] : ['ASH', 'GEORGE'];
+    return coreShiftAStaff.concat(rotatingForShiftA);
+  } else {
+    var rotatingForShiftB = isOddWeek ? ['ASH', 'GEORGE'] : ['ANDREWS', 'BENJAMIN'];
+    return shiftBLead.concat(rotatingForShiftB);
+  }
+}`;
+
+            return script;
+        }
+
+        // Generate schedule
+        function generateSchedule() {
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (!month || !year) {
+                alert('Please select both month and year');
+                return;
+            }
+            
+            // Show loading state
+            generateBtn.innerHTML = '<div class="spinner"></div> Generating...';
+            generateBtn.disabled = true;
+            
+            try {
+                const weeks = generateCalendarData(month, year);
+                const script = generateGoogleAppsScript(month, year, weeks);
+                
+                generatedScript = {
+                    script: script,
+                    month: month,
+                    year: year,
+                    filename: `reef-patrol-schedule-${month.toLowerCase()}-${year}.gs`
+                };
+                
+                // Show results
+                document.getElementById('scheduleTitle').textContent = `Reef Patrol Schedule for ${month} ${year}`;
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                alert('Error generating schedule: ' + error.message);
+            }
+            
+            // Reset button
+            generateBtn.innerHTML = '🗓️ Generate Google Apps Script';
+            generateBtn.disabled = false;
+        }
+
+        // Download script
+        function downloadScript() {
+            if (!generatedScript) {
+                alert('No script generated yet');
+                return;
+            }
+            
+            const blob = new Blob([generatedScript.script], { type: 'text/javascript' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = generatedScript.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            initializeYearDropdown();
+        };
+    </script>
+</body>
+</html>
